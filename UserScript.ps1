@@ -1,15 +1,15 @@
 Import-Module activedirectory
-function DeleteInvalidUsers {
+function DisableInvalidUsers {
     $ValidUsers = Import-Csv -Delimiter ";" -Path "C:/Scripts/personeel.csv" | Select-Object -ExpandProperty Account
     $InvalidUsers = Get-ADGroupMember "Domain Users" | Where-Object distinguishedName -like *OU=JJEAfdeling* | Where-Object { $ValidUsers -notcontains $_.SamAccountName }
     foreach ($InvalidUser in $InvalidUsers) {
-        Remove-ADUser -identity $InvalidUser -Confirm:$false
-        $DeletedUser = $InvalidUser.SamAccountName
-        Write-Output "Removed $DeletedUser from AD"
+        Disable-ADAccount -identity $InvalidUser -Confirm:$false
+        $DisabledUser = $InvalidUser.SamAccountName
+        Write-Output "Disabled $DisabledUser in AD"
     }      
 }
 
-DeleteInvalidUsers
+DisableInvalidUsers
 
 $Personeel = Import-csv -Delimiter ";" -Path "C:/Scripts/personeel.csv"
 
@@ -131,6 +131,7 @@ foreach ($User in $Personeel) {
                 -ChangePasswordAtLogon: 1 `
                 -Path "OU=$OU, OU=JJEAfdeling, DC=CynMedJJE, DC=be"
 
+            Enable-ADAccount -Identity $Account    
             Get-ADUser -Identity $Account -Properties MemberOf | ForEach-Object {
                 $_.MemberOf | Remove-ADGroupMember -Members $_.DistinguishedName -Confirm:$false
             }  
@@ -167,6 +168,7 @@ foreach ($User in $Personeel) {
                 -ChangePasswordAtLogon: 1 `
                 -Path "OU=$OU, OU=JJEAfdeling, DC=CynMedJJE, DC=be"
 
+            Eneable-ADAccount -Identity $Account    
             Get-ADUser -Identity $Account -Properties MemberOf | ForEach-Object {
                 $_.MemberOf | Remove-ADGroupMember -Members $_.DistinguishedName -Confirm:$false
             } 
