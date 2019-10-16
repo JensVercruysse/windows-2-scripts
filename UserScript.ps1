@@ -1,6 +1,8 @@
+$CSVPath = "C:/Scripts/personeel.csv"
+
 Import-Module activedirectory
 function DisableInvalidUsers {
-    $ValidUsers = Import-Csv -Delimiter ";" -Path "C:/Scripts/personeel.csv" | Select-Object -ExpandProperty Account
+    $ValidUsers = Import-Csv -Delimiter ";" -Path $CSVPath | Select-Object -ExpandProperty Account
     $InvalidUsers = Get-ADGroupMember "Domain Users" | Where-Object distinguishedName -like *OU=JJEAfdeling* | Where-Object { $ValidUsers -notcontains $_.SamAccountName }
     foreach ($InvalidUser in $InvalidUsers) {
         Disable-ADAccount -identity $InvalidUser -Confirm:$false
@@ -11,7 +13,7 @@ function DisableInvalidUsers {
 
 DisableInvalidUsers
 
-$Personeel = Import-csv -Delimiter ";" -Path "C:/Scripts/personeel.csv"
+$Personeel = Import-csv -Delimiter ";" -Path $CSVPath
 
 foreach ($User in $Personeel) {
     $Naam = $User.Naam
@@ -24,7 +26,20 @@ foreach ($User in $Personeel) {
     $ImportExport = $User.ImportExport
     $Email = $Voornaam + "." + $Naam + "@CynMedJJE.be"
     $FullName = "$Voornaam $Naam"
+
+    if ($Voornaam.length -lt 3 -or $Naam.length -lt 3){
+    $TempVoornaam = $Voornaam
+    $TempNaam = $Naam
+    Do{
+    $TempVoornaam = $TempVoornaam + "+"
+    $TempVoornaam = $TempVoornaam + "+"
+    }
+    Until($TempVoornaam -ge 3 -and $TempNaam -ge 3)
+    $Password = $TempVoornaam.substring(0, 3) + "&" + $TempNaam.substring(0, 3)
+    Write-Output "[$Voornaam $Naam] has a name shorter than 3 characters, standard password has been adjusted!"
+    } else {
     $Password = $Voornaam.substring(0, 3) + "&" + $Naam.substring(0, 3)
+    }
 
     if (Get-ADUser -F { SamAccountName -eq $Account }) {
         $UserDN = (Get-ADUser -Identity $Account).distinguishedName
@@ -168,7 +183,7 @@ foreach ($User in $Personeel) {
                 -ChangePasswordAtLogon: 1 `
                 -Path "OU=$OU, OU=JJEAfdeling, DC=CynMedJJE, DC=be"
 
-            Eneable-ADAccount -Identity $Account    
+            Enable-ADAccount -Identity $Account    
             Get-ADUser -Identity $Account -Properties MemberOf | ForEach-Object {
                 $_.MemberOf | Remove-ADGroupMember -Members $_.DistinguishedName -Confirm:$false
             } 
