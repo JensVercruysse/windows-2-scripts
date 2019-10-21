@@ -101,12 +101,13 @@ foreach ($User in $Personeel) {
     $Logistiek = $User.Logistiek
     $ImportExport = $User.ImportExport
 
-    # If else loop that gets every users OU, groups and checks if they are managers of any OU or security group
-    # Managers are put in the managers OU, the other users are sorted into the correct OU
     # Initialize variables so managers don't get overwritten 
     $OU = ""
     $ManagerOf = ""
     $GroupsArray = "" -split ","
+    
+    # If else loop that gets every user's OU, groups and checks if they are managers of any OU or security group
+    # Managers are put in the managers OU, the other users are sorted into the correct OU
     if ($Manager -eq "X") {
         if ($IT -eq "X") {
             $OU = "Managers"
@@ -156,7 +157,7 @@ foreach ($User in $Personeel) {
     # Check if a user already exists in Active Directory
     if (Get-ADUser -F { SamAccountName -eq $Account }) {
 
-        # If a user already exits check if the OU has changedn if so update the OU
+        # If a user already exits check if the OU has changed, if so update the OU
         $User = Get-ADUser -Identity $Account -Properties DistinguishedName 
         $UserOU = ($User.DistinguishedName -split "=", 3)[-1]
         $OldOU = ($UserOU -split ",", 2)[0]
@@ -180,7 +181,7 @@ foreach ($User in $Personeel) {
         }
     }
     else {
-        # If the user does not exists yet, create the user
+        # If the user does not exist yet, create the user
         Initialize-User -Voornaam $Voornaam -Naam $Naam -Account $Account -OU $OU -GroupsArray $GroupsArray
         $NumberOfAdded++
     }
