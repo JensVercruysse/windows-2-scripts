@@ -1,7 +1,7 @@
 # Import the active directory module to use active directory functions
 Import-Module activedirectory
 
-# Path where the csv file is stored
+# Path to where the csv file is stored
 $CSVPath = "C:/Scripts/personeel.csv"
 
 # Function that disables a given user and writes output to the terminal
