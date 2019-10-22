@@ -60,7 +60,7 @@ Function Initialize-User {
         -SamAccountName $Account `
         -EmailAddress $Email `
         -AccountPassword (ConvertTo-SecureString -String $Password -AsPlainText -Force) `
-        -ChangePasswordAtLogon: 1 `
+        -ChangePasswordAtLogon $true `
         -Path "OU=$OU, OU=JJEAfdeling, DC=CynMedJJE, DC=be"
 
     # Update the user's groups
