@@ -60,8 +60,10 @@ Function Initialize-User {
         -SamAccountName $Account `
         -EmailAddress $Email `
         -AccountPassword (ConvertTo-SecureString -String $Password -AsPlainText -Force) `
-        -ChangePasswordAtLogon $true `
         -Path "OU=$OU, OU=JJEAfdeling, DC=CynMedJJE, DC=be"
+    
+    # Force user to change password at first logon
+    Set-Aduser -Identity $Account -ChangePasswordAtLogon $true
 
     # Update the user's groups
     Update-Groups -Account $Account -GroupsArray $GroupsArray
