@@ -86,8 +86,14 @@ $NumberOfDisabled = 0
 $ValidUsers = Import-Csv -Delimiter ";" -Path $CSVPath | Select-Object -ExpandProperty Account
 $InvalidUsers = Get-ADGroupMember "Domain Users" | Where-Object distinguishedName -like *OU=JJEAfdeling* | Where-Object { $ValidUsers -notcontains $_.SamAccountName }
 foreach ($InvalidUser in $InvalidUsers) {
-    Disable-User
-    $NumberOfDisabled++
+
+    # Check if the account is already disabled
+    if ($(Get-ADUser -Identity $InvalidUser).enabled -eq $true) {
+        # If the user was enabled, disable the user
+        Disable-User
+        $NumberOfDisabled++
+    }
+    # If the user was already disabled, do nothing
 }
 
 # Run this loop for all users in the csv file
