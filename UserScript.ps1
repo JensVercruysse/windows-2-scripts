@@ -202,7 +202,7 @@ foreach ($User in $Personeel) {
 
 # Write feedback to the terminal about all changes
 Write-Output ""
-Write-Output "$NumberOfAdded Account(s) added."
-Write-Output "$NumberOfUpdated Account(s) updated."
-Write-Output "$NumberOfEnabled Account(s) enabled."
-Write-Output "$NumberOfDisabled Account(s) disabled."
+if ($NumberOfAdded -ne 0){ Write-Output "$NumberOfAdded Account(s) added." }
+if ($NumberOfUpdated -ne 0){ Write-Output "$NumberOfUpdated Account(s) updated." }
+if ($NumberOfEnabled -ne 0){ Write-Output "$NumberOfEnabled Account(s) enabled." }
+if ($NumberOfDisabled -ne 0){ Write-Output "$NumberOfDisabled Account(s) disabled." }
